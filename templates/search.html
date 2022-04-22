@@ -1,0 +1,42 @@
+{% extends "base.html"%}
+{% load static %}
+{% block content %}
+{% if queryset %}
+<section  class="featured-posts no-padding-top mb-4 ,mt-4">
+      <div class="container">
+        <!-- Post-->
+        {% for post in queryset %}
+
+        <div class="row d-flex align-items-stretch">
+          {% if not forloop.last and not forloop.first %}
+          <div class="image col-lg-3"><img src="{{ post.thumbnail.url}}" alt="..."> </div>
+          {% endif %}
+          <div class="text col-lg-7">
+            <div class="text-inner d-flex align-items-center">
+              <div class="content">
+                <header class="post-header">
+                  <div class="category">
+                    <a href="{{post.category.get_absolute_url}}">{{post.category.title}}</a></div>
+                  <a href="{{post.get_absolute_url}}"><h2 class="h4">{{post.title}}</h2></a>
+                </header>
+                <p>{{post.overview}}</p>
+                <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
+                    <div class="avatar"><img src="{{ post.author.profile.url }}" alt="..." class="img-fluid"></div>
+                    <div class="title"><span>{{post.author.author.username}}</span></div></a>
+                  <div class="date"><i class="icon-clock"></i> {{post.date_posted| timesince }}</div>
+                  <div class="comments"><i class="icon-comment"></i>{{post.get_comment_count}}</div>
+                </footer>
+              </div>
+            </div>
+          </div>
+          {% if forloop.first or forloop.last%}
+          <div class="image col-lg-5"><img src="{{ post.thumbnail.url}}" alt="..."> </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+
+{% endif %}
+{% endblock content%}
+      </div>
+</section>

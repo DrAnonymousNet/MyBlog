@@ -1,0 +1,75 @@
+{%  load static %}
+
+<aside class="col-lg-4">
+          <!-- Widget [Search Bar Widget]-->
+          <div class="widget search">
+            <header>
+              <h3 class="h6">Search the blog</h3>
+            </header>
+            <form action="{% url 'search'%}" class="search-form">
+              <div class="form-group">
+                <input type="text" name="search" placeholder="What are you looking for?">
+                <button type="submit" class="submit"><i class="icon-search"></i></button>
+              </div>
+            </form>
+          </div>
+          <!-- Widget [Latest Posts Widget]        -->
+
+          <div class="widget latest-posts">
+            <header>
+              <h3 class="h6">Latest Posts</h3>
+            </header>
+            <div class="blog-posts">
+                {% for latest in latests%}
+                <a href="{{latest.get_absolute_url}}">
+
+                <div class="item d-flex align-items-center">
+                  <div
+                          class="image"><img src="{{latest.thumbnail.url}}" alt="..."
+                                             class="img-fluid"></div>
+                  <div class="title"><strong>{{latest.title}}</strong>
+                    <div class="d-flex align-items-center">
+                      <div class="views"><i class="icon-eye"></i> 500</div>
+                      <div class="comments"><i class="icon-comment"></i>{{latest.get_comment_count}}</div>
+                    </div>
+                  </div>
+                </div></a>
+            {% endfor %}
+            </div>
+          </div>
+          <!-- Widget [Categories Widget]-->
+          <div class="widget categories">
+            <header>
+              <h3 class="h6">Categories</h3>
+            </header>
+              {% for cat in  category%}
+    <div
+            class="item d-flex justify-content-between"><a href="{{cat.get_absolute_url}}">{{cat.title}}</a><span>{{cat.post_set.count}}
+    </span></div>
+              {% endfor%}
+          </div>
+          <!-- Widget [Tags Cloud Widget]-->
+        <div class="widget latest-posts">
+            <header>
+              <h3 class="h6">Recently Viewed</h3>
+            </header>
+        <div class="blog-posts">
+                {% for post in recently_viewed_posts%}
+                <a href="{{post.get_absolute_url}}">
+
+                <div class="item d-flex align-items-center">
+                  <div
+                          class="image"><img src="{{post.thumbnail.url}}" alt="..."
+                                             class="img-fluid"></div>
+                  <div class="title"><strong>{{post.title}}</strong>
+                    <div class="d-flex align-items-center">
+                      <div class="views"><i class="icon-eye"></i> 500</div>
+                      <div class="comments"><i class="icon-comment"></i>{{post.get_comment_count}}</div>
+                    </div>
+                  </div>
+                </div></a>
+            {% endfor %}
+            </div>
+        </div>
+
+        </aside>

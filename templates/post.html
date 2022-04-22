@@ -1,0 +1,139 @@
+{%extends "base.html"%}
+{% load static %}
+{% load crispy_forms_tags%}
+{% block content %}
+<style>
+
+    .post-body img{
+        width: 100%;
+    }
+</style>
+    <div class="container">
+      <div class="row">
+        <!-- Latest Posts -->
+        <main class="post blog-post col-lg-8"> 
+          <div class="container">
+            <div class="post-single">
+              <div
+                      class="post-thumbnail"><img src="{{post.thumbnail.url}}" alt="..."
+                                                          class="img-fluid"></div>
+                      <div class="post-details">
+                        <div class="post-meta d-flex justify-content-between">
+                          <div class="category"><a href="{{cat.get_absolute_url}}">{{cat}}</a></div>
+                        </div>
+                        <h1>{{post.title}}<a href="#"><i class="fa fa-bookmark-o"></i></a></h1>
+                          {% if user.is_superuser%}
+                          <div class="row mt-2 mb-3 pl-3">
+
+                             <a class="btn btn-secondary btn-sm mt-1 mb-1 mr-1"
+                                href="{%url 'post_update' slug post.id%}">Update
+                             </a>
+                            <a class="btn btn-danger btn-sm mt-1 mb-1 ml-1 mr-1" href="{%url 'post_delete' slug post.id%}">Delete
+                            </a>
+                                 {%if not post.date_posted%}
+                             <a class="btn btn-secondary btn-sm mt-1 mb-1 ml-1"   href="{%url 'post_publish' slug post.id%}">
+                                 Publish</a>
+                          {% endif %}
+                          </div>
+
+                      {% endif %}
+                        <div class="post-footer d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
+                            <div class="avatar"><img src="{{post.author.profile.url}}" alt="..." class="img-fluid"></div>
+                            <div class="title"><span>{{post.author.author.username}}</span></div></a>
+                          <div class="d-flex align-items-center flex-wrap">
+                            <div class="date"><i class="icon-clock"></i>{{post.date_posted|timesince}}</div>
+                            <div class="views"><i class="icon-eye"></i> 500</div>
+                            <div class="comments meta-last"><i class="icon-comment"></i>{{post.get_comment_count}}</div>
+                          </div>
+                        </div>
+                        <div class="post-body">
+                          {{post.content|safe }}
+                  </div>
+                <div class="post-tags"><a href="#" class="tag">#Business</a><a href="#" class="tag">#Tricks</a><a href="#" class="tag">#Financial</a><a href="#" class="tag">#Economy</a></div>
+                {%if post.date_posted%}
+                  <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row">
+                  {% if previous %}
+                  <a href="{{previous.get_absolute_url}}" class="prev-post text-left d-flex align-items-center">
+                    <div class="icon prev"><i class="fa fa-angle-left"></i></div>
+                    <div class="text"><strong class="text-primary">Previous Post </strong>
+                      <h6>{{previous.title}}</h6>
+                    </div></a>
+                  {% endif %}
+                    {% if next%}
+                  <a href="{{next.get_absolute_url}}"
+                     class="next-post text-right d-flex align-items-center justify-content-end">
+                  <div class="text"><strong class="text-primary">Next Post </strong>
+                      <h6>{{next.title}}</h6>
+                    </div>
+                    <div class="icon next"><i class="fa fa-angle-right">   </i></div></a>
+                 {% endif %}
+                </div>
+                  {% endif %}
+                {% if user.is_authenticated %}
+                <div class="post-comments">
+                  <header>
+                    <h3 class="h6">Post Comments<span class="no-of-comments">({{post.get_comment_count}})</span></h3>
+                  </header>
+                  {% for comment in queryset %}
+                  <div class="comment">
+                    <div class="comment-header d-flex justify-content-between">
+                      <div class="user d-flex align-items-center">
+                        <div class="image"><img src="{{comment.author.profile.url}}" alt="..." class="img-fluid
+                          rounded-circle"></div>
+                        <div
+                                class="title"><strong>{{comment.author.author.username}}</strong><span
+                                class="date">{{comment.date_posted}}</span></div>
+                      </div>
+                    </div>
+                    <div class="comment-body">
+                      <p>{{comment.content}}.</p>
+                    </div>
+                  </div>
+                  {% endfor %}
+
+                          <!-- Pagination -->
+            <nav aria-label="Page navigation example" class="mt-5">
+              <ul class="pagination pagination-template d-flex justify-content-center">
+                {%if queryset.has_previous%}
+                <li
+                        class="page-item"><a href="?{{page_request_var}}={{queryset.previous_page_number}}"
+                                             class="page-link">
+                  <i class="fa fa-angle-left"></i></a></li>
+                {% endif %}
+                <li
+                        class="page-item"><a href="?{{page_request_var}}={{queryset.page_number}}"
+                                             class="page-link active">{{queryset.number}}</a></li>
+{%if queryset.has_next%}
+                <li class="page-item"><a href="?{{page_request_var}}={{queryset.next_page_number}}" class="page-link">
+                  <i class="fa fa-angle-right"></i></a></li>
+                {%endif%}
+              </ul>
+            </nav>
+
+
+
+                <div class="add-comment">
+                  <header>
+                    <h3 class="h6">Leave a reply</h3>
+                  </header>
+                  <form method="POST" class="commenting-form">
+                    {%csrf_token%}
+                    <div class="row">
+                      <div class="form-group col-md-12">
+                        {{form}}
+                      </div>
+                      <div class="form-group col-md-12">
+                        <button type="submit" class="btn btn-secondary">Submit Comment</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+                {% endif %}
+            </div>
+          </div>
+        </main>
+        {% include "aside.html"%}
+      </div>
+    </div>
+    {% endblock content%}

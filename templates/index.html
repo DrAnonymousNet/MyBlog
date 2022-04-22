@@ -1,0 +1,175 @@
+{% extends "base.html"%}
+{% load static %}
+{% load crispy_forms_tags%}
+{% block content %}
+
+    <!-- Hero Section-->
+    <section style="background: url({%static 'img/sparkwhite.png' %}); background-size: cover; background-position:
+    center
+center"
+             class="hero">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-7">
+            <h1></h1><a href="#" class="hero-link"></a>
+          </div>
+        </div><a href=".intro" class="continue link-scroll"><i class="fa fa-long-arrow-down"></i></a>
+      </div>
+    </section>
+    <!-- Intro Section-->
+    <section class="intro">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <h2 class="h3">Some great intro here</h2>
+            <p class="text-big">Place a nice <strong>introduction</strong> here <strong>to catch reader's attention</strong>. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="featured-posts no-padding-top">
+      <div class="container">
+        <!-- Post-->
+        {% for post in queryset %}
+
+        <div class="row d-flex align-items-stretch">
+          {% if not forloop.last and not forloop.first %}
+          <div class="image col-lg-3"><img src="{{ post.thumbnail.url}}" alt="..."> </div>
+          {% endif %}
+          <div class="text col-lg-7">
+            <div class="text-inner d-flex align-items-center">
+              <div class="content">
+                <header class="post-header">
+                  <div class="category">
+                    <a href="{{post.category.get_absolute_url}}">{{post.category.title}}</a></div>
+                  <a href="{{post.get_absolute_url}}"><h2 class="h4">{{post.title}}</h2></a>
+                </header>
+                <p>{{post.overview}}</p>
+                <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
+                    <div class="avatar"><img src="{{ post.author.profile.url }}" alt="..." class="img-fluid"></div>
+                    <div class="title"><span>{{post.author.author.username}}</span></div></a>
+                  <div class="date"><i class="icon-clock"></i> {{post.date_posted| timesince }}</div>
+                  <div class="comments"><i class="icon-comment"></i>{{post.get_comment_count}}</div>
+                </footer>
+              </div>
+            </div>
+          </div>
+          {% if forloop.first or forloop.last%}
+          <div class="image col-lg-5"><img src="{{ post.thumbnail.url}}" alt="..."> </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+            <nav aria-label="Page navigation example" class="mt-5">
+              <ul class="pagination pagination-template d-flex justify-content-center">
+                {%if queryset.has_previous%}
+                <li
+                        class="page-item"><a href="?{{page_request_var}}={{queryset.previous_page_number}}"
+                                             class="page-link">
+                  <i class="fa fa-angle-left"></i></a></li>
+                {% endif %}
+                <li
+                        class="page-item"><a href="?{{page_request_var}}={{queryset.page_number}}"
+                                             class="page-link active">{{queryset.number}}</a></li>
+{%if queryset.has_next%}
+                <li class="page-item"><a href="?{{page_request_var}}={{queryset.next_page_number}}" class="page-link">
+                  <i class="fa fa-angle-right"></i></a></li>
+                {%endif%}
+              </ul>
+            </nav>
+
+    <!-- Divider Section-->
+    <section style="background: url({%static 'img/divider-bg.jpg' %}); background-size: cover;
+    background-position:
+    center
+    bottom"
+             class="divider mt-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-7">
+            <h2>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</h2><a href="#" class="hero-link">View More</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Latest Posts -->
+
+    <section class="latest-posts"> 
+      <div class="container">
+        <header> 
+          <h2>Latest from the blog</h2>
+
+          <p class="text-big">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+        </header>
+        <div class="row">
+          {% for latest in latests%}
+          <div class="post col-md-4">
+            <div class="post-thumbnail"><a
+                    href="{{latest.get_absolute_url}}"><img src="{{latest.thumbnail.url}}" alt="..."
+                                                           class="img-fluid"></a></div>
+            <div class="post-details">
+              <div class="post-meta d-flex justify-content-between">
+                <div class="date">{{latest.date_posted}}</div>
+                <div class="category"><a href="{{latest.category.get_absolute_url}}">{{latest.category}}</a></div>
+              </div><a href="{{latest.get_absolute_url}}">
+                <h3 class="h4">{{latest.title}}</h3></a>
+              <p class="text-muted">{{latest.overview}}</p>
+            </div>
+          </div>
+          {% endfor %}
+
+          </div>
+        </div>
+
+    </section>
+    <!-- Newsletter Section-->
+    <section class="newsletter no-padding-top">    
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <h2>Subscribe to Newsletter</h2>
+            <p class="text-big">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          </div>
+          <div class="col-md-8">
+            <div class="form-holder">
+              <form method="post">
+                 {%csrf_token%}
+                <div class="form-group">
+                  {{form}}
+                  <button type="submit" class="submit">Subscribe</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Gallery Section-->
+    <section class="gallery no-padding">    
+      <div class="row">
+        <div class="mix col-lg-3 col-md-3 col-sm-6">
+          <div class="item"><a href="{% static 'img/gallery-1.jpg'%}" data-fancybox="gallery" class="image"><img
+                  src="{%static 'img/gallery-1.jpg'%}" alt="..." class="img-fluid">
+              <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div></a></div>
+        </div>
+        <div class="mix col-lg-3 col-md-3 col-sm-6">
+          <div class="item"><a href="{% static 'img/gallery-2.jpg'%}" data-fancybox="gallery" class="image"><img
+                  src="{%static 'img/gallery-2.jpg'%}" alt="..." class="img-fluid">
+              <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div></a></div>
+        </div>
+        <div class="mix col-lg-3 col-md-3 col-sm-6">
+          <div class="item"><a href= "{% static 'img/gallery-3.jpg' %}" data-fancybox="gallery" class="image"><img
+                  src="{% static 'img/gallery-3.jpg' %}" alt="..." class="img-fluid">
+              <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div></a></div>
+        </div>
+        <div class="mix col-lg-3 col-md-3 col-sm-6">
+          <div class="item"><a href="{% static 'img/gallery-4.jpg'%}" data-fancybox="gallery" class="image"><img
+                  src="{% static 'img/gallery-4.jpg'%}" alt="..." class="img-fluid">
+              <div class="overlay d-flex align-items-center justify-content-center"><i class="icon-search"></i></div></a></div>
+        </div>
+      </div>
+    </section>
+      </div>
+    </section>
+{% endblock content%}
