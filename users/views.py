@@ -44,7 +44,7 @@ def login_view(request):
     }
 
     return render(request, "login.html", context)
-"""
+
 def email_verify(request):
     sent_code = randint(100, 999)
     next_ = request.GET.get("next", None)
@@ -76,7 +76,6 @@ def email_verify(request):
         "form":verification_form
     }
     return render(request, "email_verify.html", context)
-"""
 
 def register(request):
     form = UserRegisterForm()
