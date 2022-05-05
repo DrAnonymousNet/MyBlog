@@ -1,3 +1,6 @@
+import random
+import urllib.parse
+
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserLogin, UserRegisterForm, PasswordResetForm,EmailVerificationForm
@@ -9,6 +12,7 @@ from random import randint
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
 from urllib.parse import urlencode
+from blog.settings import EMAIL_HOST_USER
 
 # Create your views here.
 
@@ -18,8 +22,6 @@ from urllib.parse import urlencode
 def login_view(request):
     next = request.GET.get("next")
     form = UserLogin()
-
-
     if request.method == "POST":
         form = UserLogin(request.POST)
         if form.is_valid():
@@ -28,12 +30,6 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             login(request,user)
             # messages.success(request,f"Welcome {username} !")
-            if not request.user.is_active:
-                email = request.user.email
-                base_url = reverse(email_verify)
-                query_string = urlencode({"email": email})
-                full_url = f"{base_url}?{query_string}"
-                return redirect(full_url)
             if next:
                 return redirect(next)
 
@@ -44,57 +40,65 @@ def login_view(request):
     }
 
     return render(request, "login.html", context)
-"""
-def email_verify(request):
-    sent_code = randint(100, 999)
-    next_ = request.GET.get("next", None)
-    if request.method == "POST":
-        verification_form = EmailVerificationForm(request.POST)
-        if verification_form.is_valid():
-            verification_code = verification_form.cleaned_data.get("verification_code")
-            if verification_code == sent_code:
-                messages.success(request, "Your account has been created successfully, You can now Login!")
-                request.user.is_active = True
-                if next_:
-                    return redirect(next_)
-                return redirect("login")
 
-    email = request.GET.get("email", None)
-    if not email:
-        email = request.user.email
-    #email = email[:email.index("%")] + "@gmail.com"
-    try:
-        send_mail(subject="Email Verification Code",message=f"This is your Verification Code {sent_code}",
-                recipient_list=["haryourjb@gmail.com"],
-                from_email="haryournifemijbt@gmail.com")
-    except BadHeaderError:
-        return HttpResponse('Invalid header found')
-    verification_form = EmailVerificationForm()
-    messages.info(request, "A Code Has Been Sent To Your Email")
-
-    context = {
-        "form":verification_form
-    }
-    return render(request, "email_verify.html", context)
-"""
 
 def register(request):
-    form = UserRegisterForm()
+    form = UserRegisterForm(request.POST or None)
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
+            user = form.save(commit=False)
+            password = form.cleaned_data.get("password")
+
+            user.set_password(password)
+            user.save()
             #form.instance.is_active = False
-            form.instance.save()
-            """email = form.cleaned_data.get("email")
-            base_url = reverse(email_verify)
-            query_string = urlencode({"email":email})
-            full_url = f"{base_url}?{query_string}"
-            return redirect(full_url)"""
+
+            initial_url = reverse("email_verify")
+            query_string =urllib.parse.urlencode({"email":form.instance.email})
+            full_url = f"{initial_url}?{query_string}"
+
+            return redirect(full_url)
 
     context = {
         "form": form
     }
     return render(request, "register.html", context)
+
+def email_verify(request):
+    random.seed(20)
+    verification_code = random.randint(0, 1000)
+    if request.method == "GET":
+
+        validation_form = EmailVerificationForm()
+        email = request.GET.get("email", None)
+        send_verification_mail(verification_code, email)
+
+    if request.method == "POST":
+
+        validation_form = EmailVerificationForm(request.POST)
+        if validation_form.is_valid():
+            input_code = validation_form.cleaned_data.get("verification_code")
+            if input_code == verification_code:
+                messages.success(request, "You can now log in !")
+                return redirect("login")
+            else:
+                messages.error(request, "Incorrect Verification Code")
+    context = {
+        "form":validation_form
+    }
+    return render(request, "email_verify.html", context)
+
+def send_verification_mail(code, email):
+    sender = "haryournifemijt@gmail.com"
+    message = str(code)
+    receiver = email
+    subject = "Email Verification"
+    send_mail(subject=subject,
+                  message=message,
+                  from_email=sender,
+                  recipient_list=[receiver]
+                  )
 
 
 def logout_view(request):
@@ -102,15 +106,18 @@ def logout_view(request):
     return render(request, 'logout.html')
 
 def reset_password(request):
-    form = PasswordResetForm()
+    form = PasswordResetForm(request.user)
 
     if request.method == "POST":
-        form = PasswordResetForm(request.POST)
+        form = PasswordResetForm(request.user, request.POST)
+        print("WHYYYYYYY")
         if form.is_valid():
-            user = User.objects.get(username=form.cleaned_data.get("user_name"))
+            user = User.objects.get(email=form.cleaned_data.get("email"))
             user.set_password(form.cleaned_data.get("new_password_1"))
             user.save()
+            print("HEEEEEEEEEEEEEEEE")
             return redirect("login")
+
     context = {
         "form":form
     }

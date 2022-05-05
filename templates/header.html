@@ -46,6 +46,7 @@
               {% elif user.is_authenticated%}
               <li class="nav-item"><a href="{% url 'logout'%}" class="nav-link ">Logout</a>
               </li>
+              <li class="nav-item"> <a href="{% url 'reset_password'%}"> Reset Password</a> </li>
               {%endif%}
             </ul>
             <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1"></i></a></div>

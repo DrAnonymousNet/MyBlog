@@ -4,14 +4,32 @@ from django import forms
 from django.contrib.auth import authenticate
 
 
+class UserRegisterForm(forms.ModelForm):
+    first_name = forms.CharField(required=True, max_length=30,
+                                 widget=forms.TextInput)
+    last_name = forms.CharField(required=True, max_length=30,
+                                widget=forms.TextInput)
+    email = forms.CharField(required=True, max_length=50,
+                            widget=forms.EmailInput)
 
-class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    first_name  = forms.CharField(max_length=30)
-    last_name = forms.CharField(max_length=30)
-    class Meta():
+    password = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(widget=forms.PasswordInput, label="Passweord", help_text="Enter Password Again...")
+
+    class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "email", "password1", "password2"]
+        fields = ["username", "first_name", "last_name", "email", "password", ]
+
+    def clean(self, *args, **kwargs):
+        email = self.cleaned_data.get("email")
+        eqs = User.objects.filter(email=email)
+
+        if eqs.count() != 0:
+            raise forms.ValidationError("This Email already exist")
+        if self.cleaned_data.get("password") != self.cleaned_data.get("password2"):
+            raise forms.ValidationError("Passwords must match !")
+
+        return super(UserRegisterForm, self).clean(*args, **kwargs)
+
 
 class UserLogin(forms.Form):
     username = forms.CharField()
@@ -26,27 +44,44 @@ class UserLogin(forms.Form):
             if not user:
                 raise forms.ValidationError("This user does not exist")
             if not user.check_password(password):
-                raise forms.ValidationError({password:"Incorrect password"})
+                raise forms.ValidationError({password: "Incorrect password"})
 
+        return super(UserLogin, self).clean(*args, **kwargs)
 
-        return super(UserLogin , self).clean(*args, **kwargs)
 
 class PasswordResetForm(forms.Form):
-    user_name = forms.CharField()
+    email = forms.CharField(widget=forms.EmailInput)
     old_password = forms.CharField(widget=forms.PasswordInput)
-    new_password_1 =forms.CharField(widget=forms.PasswordInput, label="New Password")
-    new_password_2 = forms.CharField(widget=forms.PasswordInput, label="New Password 2", initial="Enter New Password "
-                                                                                                 "Again")
+    new_password_1 = forms.CharField(widget=forms.PasswordInput, label="New Password")
+    new_password_2 = forms.CharField(widget=forms.PasswordInput, label="New Password 2",
+                                     initial="Enter New Password Again")
 
+    def __init__(self, user, *args, **kwargs):
+
+        self.user = user
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
+        print("IN HERRRRRRR")
         password = self.cleaned_data.get("old_password")
         new_password_1 = self.cleaned_data.get("new_password_1")
         new_password_2 = self.cleaned_data.get("new_password_2")
-        try:
-            user = User.objects.get(username= self.cleaned_data.get("user_name"))
-        except:
-            raise forms.ValidationError("No User with the Username")
+        if self.user:
+
+            try:
+                print("NOOOOOOOO")
+                user = User.objects.get(email=self.cleaned_data.get("email"))
+            except:
+                raise forms.ValidationError("No User with the Email")
+            if self.user != user:
+                raise forms.ValidationError("Your Mail does not match !")
+
+        else:
+            try:
+                user = User.objects.get(email=self.cleaned_data.get("email"))
+                print("YESSSSSSSSSSS")
+            except:
+                raise forms.ValidationError("No User with the Email")
 
         if not user.check_password(password):
             raise forms.ValidationError("Incorrect Old Password")
@@ -54,10 +89,6 @@ class PasswordResetForm(forms.Form):
             raise forms.ValidationError("Unmatched Password")
         super(PasswordResetForm, self).clean(*args, **kwargs)
 
+
 class EmailVerificationForm(forms.Form):
     verification_code = forms.IntegerField()
-
-
-
-
-
