@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from post.views import index, post, post_create, blog, post_delete, category_post, category_create, \
     search, post_update, draft, post_publish,send_email
-from users.views import login_view, register, logout_view, reset_password, email_verify
+from users.views import login_view, register, logout_view, reset_password, email_verify, forgot_password,email_view
 
 from . import settings
 
@@ -31,6 +31,8 @@ urlpatterns = [
     path('contact/', send_email, name= 'contact'),
     path('reset-password/',reset_password, name="reset_password"),
     path('email-verify/', email_verify, name="email_verify"),
+    path('forgot-password', forgot_password, name="forgot_password"),
+    path('email-view', email_view, name="email-view"),
     path('tinymce/', include('tinymce.urls'))
 ]
 

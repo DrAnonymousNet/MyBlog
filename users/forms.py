@@ -92,3 +92,26 @@ class PasswordResetForm(forms.Form):
 
 class EmailVerificationForm(forms.Form):
     verification_code = forms.IntegerField()
+
+class ForgotPasswordForm(forms.Form):
+    new_password = forms.CharField(widget=forms.PasswordInput)
+    new_password_2 = forms.CharField(widget=forms.PasswordInput)
+
+    def clean(self, *args, **kwargs):
+        new_password_1 = self.cleaned_data.get("new_password")
+        new_password_2 = self.cleaned_data.get("new_password_2")
+
+        if new_password_1 != new_password_2:
+            raise forms.ValidationError("Password Does Not Match !")
+        super(ForgotPasswordForm, self).clean(*args, **kwargs)
+
+class EmailForm(forms.Form):
+    email = forms.CharField(widget=forms.EmailInput)
+    
+    def clean(self,  *args, **kwargs):
+        email = self.cleaned_data.get("email", None)
+        try:
+            user = User.objects.get(email=email)
+        except:
+            raise forms.ValidationError("No User With this Email")
+        super(EmailForm, self).clean(*args, **kwargs)
