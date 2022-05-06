@@ -49,6 +49,7 @@ class Post(models.Model):
     overview = models.TextField()
     featured = models.BooleanField(default=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    views = models.IntegerField( default= 0, editable=False)
 
     class Meta:
         ordering = ["date_posted"]

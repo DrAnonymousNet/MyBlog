@@ -42,7 +42,7 @@
                             <div class="title"><span>{{post.author.author.username}}</span></div></a>
                           <div class="d-flex align-items-center flex-wrap">
                             <div class="date"><i class="icon-clock"></i>{{post.date_posted|timesince}}</div>
-                            <div class="views"><i class="icon-eye"></i> 500</div>
+                            <div class="views"><i class="icon-eye"></i>{{post.views}}</div>
                             <div class="comments meta-last"><i class="icon-comment"></i>{{post.get_comment_count}}</div>
                           </div>
                         </div>

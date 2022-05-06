@@ -51,6 +51,8 @@ def register(request):
 
             user.set_password(password)
             user.save()
+            author = Author.objects.create(author=user)
+            author.save()
             # form.instance.is_active = False
 
             initial_url = reverse("email_verify")

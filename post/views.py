@@ -30,6 +30,21 @@ def recently_viewed(request, post_id):
     request.session.modified =True
     return
 
+def post_view_session(request, id):
+    flag = False
+    if "viewed_post" in request.session:
+
+        if id not in request.session["viewed_post"]:
+            request.session["viewed_post"].append(id)
+            flag = True
+    else:
+        request.session["viewed_post"] = []
+        request.session["viewed_post"].append(id)
+        flag = True
+    print(request.session["viewed_post"])
+    request.session.modified =True
+    return flag
+
 
 def pagination(request, queryset, num_per_page):
     page_request_var = "page"
@@ -99,6 +114,10 @@ def category_post(request, slug):
 
 def post(request, slug, id):
     post = Post.objects.get(id=id)
+    if post_view_session(request, id):
+        post.views += 1
+        post.save()
+    print(post.views)
     category = Category.objects.all()
     cat = Category.objects.get(slug=slug)
     latests = Post.objects.filter(date_posted__isnull=False).order_by('-date_posted')[:3]
@@ -111,8 +130,6 @@ def post(request, slug, id):
             "next": next,
         }
 
-    comment = Comment.objects.filter(post=post)
-    page_request_var, page, paginated_queryset = pagination(request, comment, num_per_page=10)
     form = CommentForm()
     recently_viewed_qs = recently_viewed(request, id)
     if request.method == "POST":
@@ -123,6 +140,8 @@ def post(request, slug, id):
             form.instance.post = post
             form.save()
             form = CommentForm()
+    comment = Comment.objects.filter(post=post)
+    page_request_var, page, paginated_queryset = pagination(request, comment, num_per_page=4)
 
     cont = {"post": post,
             "category": category,
@@ -285,3 +304,4 @@ def send_email(request):
         'form': form
     }
     return render(request, 'contact.html', context=context)
+
