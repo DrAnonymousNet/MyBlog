@@ -15,20 +15,15 @@ def recently_viewed(request, post_id):
     if "recently_viewed" in request.session:
         if post_id in request.session["recently_viewed"]:
             request.session["recently_viewed"].remove(post_id)
-        recently_viewed_qs = Post.objects.filter(pk__in = request.session["recently_viewed"])
-
         request.session["recently_viewed"].insert(0, post_id)
         if len(request.session["recently_viewed"]) > 5:
             request.session["recently_viewed"].pop()
 
         request.session.modified = True
-
-
-        return recently_viewed_qs
     else:
         request.session["recently_viewed"] = []
     request.session.modified =True
-    return
+
 
 def post_view_session(request, id):
     flag = False
@@ -84,12 +79,14 @@ def blog(request):
     category = Category.objects.all()
     page_request_var, page, paginated_queryset = pagination(request, category, num_per_page=3)
     latests = Post.objects.filter(date_posted__isnull=False).order_by('-date_posted')[:3]
+    recently_viewed_qs = Post.objects.filter(pk__in=request.session.get("recently_viewed", []))
     context = {
         "category": category[:],
         "page": page,
         "queryset": paginated_queryset,
         "page_request_var": page_request_var,
-        "latests": latests
+        "latests": latests,
+        "recently_viewed":recently_viewed_qs
     }
     return render(request, "blog.html", context)
 
@@ -99,12 +96,14 @@ def category_post(request, slug):
     cat = category.get(slug=slug)
     posts = Post.objects.filter(category=cat, date_posted__isnull=False)
     latests = Post.objects.filter(date_posted__isnull=False).order_by('-date_posted')[:3]
+    recently_viewed_qs = Post.objects.filter(pk__in=request.session.get("recently_viewed", []))
     page_request_var, page, paginated_queryset = pagination(request, posts, num_per_page=3)
     context = {
         "category": category[:],
         "cat": cat, "slug": slug,
         "queryset": paginated_queryset,
         "page": page,
+        "recently_viewed":recently_viewed_qs,
         "page_request_var": page_request_var,
         "latests": latests
 
@@ -131,7 +130,8 @@ def post(request, slug, id):
         }
 
     form = CommentForm()
-    recently_viewed_qs = recently_viewed(request, id)
+    recently_viewed(request, id)
+    recently_viewed_qs = Post.objects.filter(pk__in=request.session.get("recently_viewed", []))
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -149,13 +149,11 @@ def post(request, slug, id):
             "cat": cat, "form": form,
             "queryset": paginated_queryset,
             "page": page, "slug": slug,
+            "recently_viewed":recently_viewed_qs,
             "page_request_var": page_request_var,
             }
     for c in cont.keys():
         context[c] = cont[c]
-    if recently_viewed_qs:
-        context["recently_viewed_posts"] = recently_viewed_qs
-
     return render(request, "post.html", context)
 
 
