@@ -22,7 +22,9 @@ def recently_viewed(request, post_id):
         request.session.modified = True
     else:
         request.session["recently_viewed"] = []
+        request.session["recently_viewed"].append(post_id)
     request.session.modified =True
+    print(request.session["recently_viewed"])
 
 
 def post_view_session(request, id):
@@ -132,6 +134,7 @@ def post(request, slug, id):
     form = CommentForm()
     recently_viewed(request, id)
     recently_viewed_qs = Post.objects.filter(pk__in=request.session.get("recently_viewed", []))
+    recently_viewed_qs = sorted(recently_viewed_qs, key=lambda x: request.session["recently_viewed"].index(x.id))
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
