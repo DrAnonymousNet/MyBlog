@@ -29,7 +29,7 @@
                                              class="img-fluid"></div>
                   <div class="title"><strong>{{latest.title}}</strong>
                     <div class="d-flex align-items-center">
-                      <div class="views"><i class="icon-eye"></i>{{latest.views}}</div>
+                      <div class="views"><i class="icon-eye"></i> 500</div>
                       <div class="comments"><i class="icon-comment"></i>{{latest.get_comment_count}}</div>
                     </div>
                   </div>
@@ -49,27 +49,6 @@
               {% endfor%}
           </div>
           <!-- Widget [Tags Cloud Widget]-->
-        <div class="widget latest-posts">
-            <header>
-              <h3 class="h6">Recently Viewed</h3>
-            </header>
-        <div class="blog-posts">
-                {% for post in recently_viewed%}
-                <a href="{{post.get_absolute_url}}">
 
-                <div class="item d-flex align-items-center">
-                  <div
-                          class="image"><img src="{{post.thumbnail.url}}" alt="..."
-                                             class="img-fluid"></div>
-                  <div class="title"><strong>{{post.title}}</strong>
-                    <div class="d-flex align-items-center">
-                      <div class="views"><i class="icon-eye"></i>{{post.views}}</div>
-                      <div class="comments"><i class="icon-comment"></i>{{post.get_comment_count}}</div>
-                    </div>
-                  </div>
-                </div></a>
-            {% endfor %}
-            </div>
-        </div>
 
         </aside>

@@ -11,38 +11,6 @@ from django.http import HttpResponseNotAllowed, HttpResponseForbidden, Http404, 
 from django.core.mail import send_mail, BadHeaderError
 from django.template.defaultfilters import slugify
 
-def recently_viewed(request, post_id):
-    if "recently_viewed" in request.session:
-        if post_id in request.session["recently_viewed"]:
-            request.session["recently_viewed"].remove(post_id)
-        request.session["recently_viewed"].insert(0, post_id)
-        if len(request.session["recently_viewed"]) > 5:
-            request.session["recently_viewed"].pop()
-
-        request.session.modified = True
-    else:
-        request.session["recently_viewed"] = []
-        request.session["recently_viewed"].append(post_id)
-    request.session.modified =True
-    print(request.session["recently_viewed"])
-
-
-def post_view_session(request, id):
-    flag = False
-    if "viewed_post" in request.session:
-
-        if id not in request.session["viewed_post"]:
-            request.session["viewed_post"].append(id)
-            flag = True
-    else:
-        request.session["viewed_post"] = []
-        request.session["viewed_post"].append(id)
-        flag = True
-    print(request.session["viewed_post"])
-    request.session.modified =True
-    return flag
-
-
 def pagination(request, queryset, num_per_page):
     page_request_var = "page"
     page = request.GET.get(page_request_var)
@@ -81,14 +49,12 @@ def blog(request):
     category = Category.objects.all()
     page_request_var, page, paginated_queryset = pagination(request, category, num_per_page=3)
     latests = Post.objects.filter(date_posted__isnull=False).order_by('-date_posted')[:3]
-    recently_viewed_qs = Post.objects.filter(pk__in=request.session.get("recently_viewed", []))
     context = {
         "category": category[:],
         "page": page,
         "queryset": paginated_queryset,
         "page_request_var": page_request_var,
-        "latests": latests,
-        "recently_viewed":recently_viewed_qs
+        "latests": latests
     }
     return render(request, "blog.html", context)
 
@@ -98,14 +64,12 @@ def category_post(request, slug):
     cat = category.get(slug=slug)
     posts = Post.objects.filter(category=cat, date_posted__isnull=False)
     latests = Post.objects.filter(date_posted__isnull=False).order_by('-date_posted')[:3]
-    recently_viewed_qs = Post.objects.filter(pk__in=request.session.get("recently_viewed", []))
     page_request_var, page, paginated_queryset = pagination(request, posts, num_per_page=3)
     context = {
         "category": category[:],
         "cat": cat, "slug": slug,
         "queryset": paginated_queryset,
         "page": page,
-        "recently_viewed":recently_viewed_qs,
         "page_request_var": page_request_var,
         "latests": latests
 
@@ -115,10 +79,6 @@ def category_post(request, slug):
 
 def post(request, slug, id):
     post = Post.objects.get(id=id)
-    if post_view_session(request, id):
-        post.views += 1
-        post.save()
-    print(post.views)
     category = Category.objects.all()
     cat = Category.objects.get(slug=slug)
     latests = Post.objects.filter(date_posted__isnull=False).order_by('-date_posted')[:3]
@@ -131,10 +91,9 @@ def post(request, slug, id):
             "next": next,
         }
 
+    comment = Comment.objects.filter(post=post)
+    page_request_var, page, paginated_queryset = pagination(request, comment, num_per_page=10)
     form = CommentForm()
-    recently_viewed(request, id)
-    recently_viewed_qs = Post.objects.filter(pk__in=request.session.get("recently_viewed", []))
-    recently_viewed_qs = sorted(recently_viewed_qs, key=lambda x: request.session["recently_viewed"].index(x.id))
     if request.method == "POST":
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -143,8 +102,6 @@ def post(request, slug, id):
             form.instance.post = post
             form.save()
             form = CommentForm()
-    comment = Comment.objects.filter(post=post)
-    page_request_var, page, paginated_queryset = pagination(request, comment, num_per_page=4)
 
     cont = {"post": post,
             "category": category,
@@ -152,11 +109,11 @@ def post(request, slug, id):
             "cat": cat, "form": form,
             "queryset": paginated_queryset,
             "page": page, "slug": slug,
-            "recently_viewed":recently_viewed_qs,
             "page_request_var": page_request_var,
             }
     for c in cont.keys():
         context[c] = cont[c]
+
     return render(request, "post.html", context)
 
 
@@ -305,4 +262,3 @@ def send_email(request):
         'form': form
     }
     return render(request, 'contact.html', context=context)
-

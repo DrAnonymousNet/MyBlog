@@ -30,7 +30,6 @@ class UserRegisterForm(forms.ModelForm):
 
         return super(UserRegisterForm, self).clean(*args, **kwargs)
 
-
 class UserLogin(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
@@ -44,44 +43,27 @@ class UserLogin(forms.Form):
             if not user:
                 raise forms.ValidationError("This user does not exist")
             if not user.check_password(password):
-                raise forms.ValidationError({password: "Incorrect password"})
+                raise forms.ValidationError({password:"Incorrect password"})
 
-        return super(UserLogin, self).clean(*args, **kwargs)
 
+        return super(UserLogin , self).clean(*args, **kwargs)
 
 class PasswordResetForm(forms.Form):
-    email = forms.CharField(widget=forms.EmailInput)
+    user_name = forms.CharField()
     old_password = forms.CharField(widget=forms.PasswordInput)
-    new_password_1 = forms.CharField(widget=forms.PasswordInput, label="New Password")
-    new_password_2 = forms.CharField(widget=forms.PasswordInput, label="New Password 2",
-                                     initial="Enter New Password Again")
+    new_password_1 =forms.CharField(widget=forms.PasswordInput, label="New Password")
+    new_password_2 = forms.CharField(widget=forms.PasswordInput, label="New Password 2", initial="Enter New Password "
+                                                                                                 "Again")
 
-    def __init__(self, user, *args, **kwargs):
-
-        self.user = user
-        super(PasswordResetForm, self).__init__(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
-        print("IN HERRRRRRR")
         password = self.cleaned_data.get("old_password")
         new_password_1 = self.cleaned_data.get("new_password_1")
         new_password_2 = self.cleaned_data.get("new_password_2")
-        if self.user:
-
-            try:
-                print("NOOOOOOOO")
-                user = User.objects.get(email=self.cleaned_data.get("email"))
-            except:
-                raise forms.ValidationError("No User with the Email")
-            if self.user != user:
-                raise forms.ValidationError("Your Mail does not match !")
-
-        else:
-            try:
-                user = User.objects.get(email=self.cleaned_data.get("email"))
-                print("YESSSSSSSSSSS")
-            except:
-                raise forms.ValidationError("No User with the Email")
+        try:
+            user = User.objects.get(username= self.cleaned_data.get("user_name"))
+        except:
+            raise forms.ValidationError("No User with the Username")
 
         if not user.check_password(password):
             raise forms.ValidationError("Incorrect Old Password")
@@ -89,29 +71,10 @@ class PasswordResetForm(forms.Form):
             raise forms.ValidationError("Unmatched Password")
         super(PasswordResetForm, self).clean(*args, **kwargs)
 
-
 class EmailVerificationForm(forms.Form):
     verification_code = forms.IntegerField()
 
-class ForgotPasswordForm(forms.Form):
-    new_password = forms.CharField(widget=forms.PasswordInput)
-    new_password_2 = forms.CharField(widget=forms.PasswordInput)
 
-    def clean(self, *args, **kwargs):
-        new_password_1 = self.cleaned_data.get("new_password")
-        new_password_2 = self.cleaned_data.get("new_password_2")
 
-        if new_password_1 != new_password_2:
-            raise forms.ValidationError("Password Does Not Match !")
-        super(ForgotPasswordForm, self).clean(*args, **kwargs)
 
-class EmailForm(forms.Form):
-    email = forms.CharField(widget=forms.EmailInput)
-    
-    def clean(self,  *args, **kwargs):
-        email = self.cleaned_data.get("email", None)
-        try:
-            user = User.objects.get(email=email)
-        except:
-            raise forms.ValidationError("No User With this Email")
-        super(EmailForm, self).clean(*args, **kwargs)
+

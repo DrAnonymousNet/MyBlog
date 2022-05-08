@@ -151,8 +151,8 @@ TINYMCE_DEFAULT_CONFIG = {
     'statusbar': True,
 }
 """
-AWS_ACCESS_KEY_ID= ""
-AWS_SECRET_ACCESS_KEY= ""
+AWS_ACCESS_KEY_ID= "AKIAXSCF6ADXGQHQAPXV"
+AWS_SECRET_ACCESS_KEY= "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"
 AWS_STORAGE_BUCKET_NAME= "dranonymous"
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
@@ -189,5 +189,5 @@ EMAIL_HOST_USER = "haryournifemijt@gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST_PASSWORD ="Rkxlie9d" #os.environ.get("EMAIL_PASS")
+EMAIL_HOST_PASSWORD = "Rkxlie9d"
 EMAIL_PORT = 587

@@ -6,14 +6,14 @@
             <form method="POST">
                 {% csrf_token %}
                 <fieldset class="form-group">
-                    <legend class="border-bottom mb-4">Verification Code</legend>
+                    <legend class="border-bottom mb-4">Log In</legend>
                     {{ form|crispy }}
                 </fieldset>
                 <div class="form-group">
                     <button class="btn  btn-outline-primary" type="submit">Verify</button>
                     <small class="text-muted ml-2">
                         Incorrect Email ?
-                        <a href="{% url 'register'%}" methods="post">Re Enter</a>
+                        <a href="{% url 'register'%}">Re Enter</a>
                     </small>
 
                 </div>
