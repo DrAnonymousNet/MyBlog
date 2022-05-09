@@ -86,6 +86,8 @@ def register(request):
             #form.instance.is_active = False
             form.instance.set_password(form.cleaned_data.get("password"))
             form.instance.save()
+            author = Author.objects.create( user=form.instance)
+            author.save()
             """email = form.cleaned_data.get("email")
             base_url = reverse(email_verify)
             query_string = urlencode({"email":email})
