@@ -1,7 +1,20 @@
 # MyBlog
 A Blog Web app built with Django and Template from bootstapious.com.
 
-# LINK
+## Images
+
+
+![Screenshot from 2022-05-09 12-09-52](https://user-images.githubusercontent.com/64500446/167460541-a32094a2-2810-4fe8-a0ff-9cd5c0ef400b.png)
+
+![Screenshot from 2022-05-09 13-04-12](https://user-images.githubusercontent.com/64500446/167461013-9384f615-fbed-4ef9-863a-6e98428f8076.png)
+
+
+![Screenshot from 2022-05-09 12-55-49](https://user-images.githubusercontent.com/64500446/167460643-d83d7df0-3de9-4322-b4ce-f28d5993e03a.png)
+![Screenshot from 2022-05-09 12-57-17](https://user-images.githubusercontent.com/64500446/167460756-5df9a58e-ffaa-4748-8cbd-db9aa1991044.png)
+
+
+
+## LINK
 [My blog is hosted here](ahmadnuggets.pythonanywhere.com)
 
 
@@ -31,6 +44,8 @@ A Blog Web app built with Django and Template from bootstapious.com.
 4. Unique Post view count
 
 5. User specific recently viewed post
+
+6. Editor
 
 ## Known Bug
 
