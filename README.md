@@ -15,7 +15,7 @@ A Blog Web app built with Django and Template from bootstapious.com.
 
 
 ## LINK
-[My blog is hosted here](ahmadnuggets.pythonanywhere.com)
+Live at www.ahmadnuggets.pythonanywhere.com
 
 
 ## Installation
